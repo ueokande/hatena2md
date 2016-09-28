@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+lib = File.expand_path('../../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+
+DEFAULT_OUTPUT_DIR= 'target'.freeze
+
+def usage
+  STDERR.puts "Usage: hatena2markdown [OPTION..] <source_mtif>"
+  STDERR.puts ""
+  STDERR.puts "  -o         output directory (default is \"target\")"
+end
+
+if ARGV.empty? || ARGV.include?('-h') || ARGV.include?('--help')
+  usage()
+  exit(1)
+end
+
+output_option_index = ARGV.index('-o') || ARGV.index('--output')
+if output_option_index.nil?
+  output_dir = DEFAULT_OUTPUT_DIR
+elsif output_option_index < (ARGV.length - 1)
+  output_dir = ARGV[output_option_index + 1]
+  ARGV.delete_at(output_option_index)
+  ARGV.delete_at(output_option_index)
+else
+  usage
+  exit(1)
+end
+
+require 'hatena2md'
+Hatena2md::App.new.run({ source: ARGV[0],
+                         output_dir: output_dir })
