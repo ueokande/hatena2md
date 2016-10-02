@@ -110,7 +110,7 @@ class MarkdownBuilder
   end
 
   def ol(node)
-    markdown = node.children.map.with_index do |li, index|
+    markdown = node.children.select{|c| c.name == 'li'}.map.with_index do |li, index|
       "#{index}. #{convert_children(li)}\n"
     end.join
     "#{markdown}\n"
