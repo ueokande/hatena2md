@@ -70,7 +70,7 @@ class MarkdownBuilder
     if node.attribute('class').to_s == 'section'
       convert_children(node)
     elsif node.attribute('class').to_s == 'seemore'
-      "<!-- READMORE -->\n" + convert_children(node)
+      "READMORE\n" + convert_children(node)
     end
   end
 
