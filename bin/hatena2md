@@ -3,12 +3,10 @@
 lib = File.expand_path('../../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-DEFAULT_OUTPUT_DIR= 'target'.freeze
-
 def usage
   STDERR.puts "Usage: hatena2markdown [OPTION..] <source_mtif>"
   STDERR.puts ""
-  STDERR.puts "  -o         output directory (default is \"target\")"
+  STDERR.puts "  -o         output directory (default is basename of <source_mtif>)"
 end
 
 if ARGV.empty? || ARGV.include?('-h') || ARGV.include?('--help')
@@ -17,17 +15,19 @@ if ARGV.empty? || ARGV.include?('-h') || ARGV.include?('--help')
 end
 
 output_option_index = ARGV.index('-o') || ARGV.index('--output')
-if output_option_index.nil?
-  output_dir = DEFAULT_OUTPUT_DIR
-elsif output_option_index < (ARGV.length - 1)
-  output_dir = ARGV[output_option_index + 1]
-  ARGV.delete_at(output_option_index)
-  ARGV.delete_at(output_option_index)
-else
+if output_option_index == (ARGV.length - 1)
   usage
   exit(1)
 end
 
+if output_option_index
+  ARGV.delete_at(output_option_index)
+  output_dir = ARGV.delete_at(output_option_index)
+end
+
+source = File.basename(ARGV[0])
+output_dir = File.basename(source, File.extname(source)) unless output_dir
+
 require 'hatena2md'
-Hatena2md::App.new.run({ source: ARGV[0],
+Hatena2md::App.new.run({ source: source,
                          output_dir: output_dir })
