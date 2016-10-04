@@ -12,15 +12,13 @@ module Hatena2md
       @status = data[:status]
       @body = data[:body]
       @basename = File.basename(data[:basename].to_s)
-
-      parsed_date = Date._strptime(data[:date], '%m/%d/%Y')
-      @date = Date.new(parsed_date[:year], parsed_date[:mon], parsed_date[:mday])
+      @date = DateTime.strptime(data[:date], '%m/%d/%Y %H:%M:%S')
     end
 
     def frontmatter
       FrontmatterBuilder.new
         .title(title)
-        .date(date.strftime('%Y-%m-%d'))
+        .date(date.strftime('%Y-%m-%d %H:%M:%S JST'))
         .tags(tags.join(","))
         .build()
     end
