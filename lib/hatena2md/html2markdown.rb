@@ -55,7 +55,7 @@ class MarkdownBuilder
   end
 
   def br(node)
-    "<br />"
+    "  \n"
   end
 
   def pre(node)
@@ -125,7 +125,7 @@ class MarkdownBuilder
   end
 
   def text(node)
-    node.inner_text
+    node.inner_text.gsub(/\A\n*/, '').gsub(/\n*\z/, '').gsub(/\A +/, ' ').gsub(/ +\z/, ' ')
   end
 
   def blockquote(node)
