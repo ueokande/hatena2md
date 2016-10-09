@@ -1,4 +1,6 @@
 require 'hatena2md/article'
+require 'hatena2md/article_frontmatter'
+require 'hatena2md/article_markdown_builder'
 require 'mtif'
 
 module Hatena2md
@@ -18,10 +20,19 @@ module Hatena2md
                                   "#{article.basename}.html.md")
         FileUtils.mkdir_p File.dirname(markdown_file)
 
+        mdBuilder = ArticleMarkdownBuilder.new(article)
+        if options[:remove_keyword]
+          require 'hatena2md/html_filter/keyword_filter'
+          mdBuilder.add_filter(HtmlFilter::KeywordFilter.new)
+        end
+
+        frontmatter = ArticleFrontmatter.new(article).frontmatter
+        markdown = mdBuilder.build
+
         File.open(markdown_file, 'w') do |file|
-          file.write(article.frontmatter)
+          file.write(frontmatter)
           file.write("\n")
-          file.write(article.markdown)
+          file.write(markdown)
         end
       end
     end

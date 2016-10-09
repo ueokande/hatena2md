@@ -14,17 +14,5 @@ module Hatena2md
       @basename = File.basename(data[:basename].to_s)
       @date = DateTime.strptime(data[:date], '%m/%d/%Y %H:%M:%S')
     end
-
-    def frontmatter
-      FrontmatterBuilder.new
-        .title(title)
-        .date(date.strftime('%Y-%m-%d %H:%M:%S JST'))
-        .tags(tags.join(","))
-        .build()
-    end
-
-    def markdown
-      MarkdownBuilder.new(body).build
-    end
   end
 end

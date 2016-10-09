@@ -1,19 +1,15 @@
 require 'nokogiri'
 
-class MarkdownBuilder
+class Html2Markdown
 
-  def initialize(data)
-    @document = Nokogiri::HTML.parse(data)
+  def initialize(document)
+    @document = document
   end
 
   def a(node)
-    if node.attribute('class').to_s == 'keyword'
-      convert_children(node)
-    else
-      text = convert_children(node)
-      href = node.attribute('href')
-      "[#{text}](#{href})"
-    end
+    text = convert_children(node)
+    href = node.attribute('href')
+    "[#{text}](#{href})"
   end
   
   def img(node)
