@@ -15,8 +15,9 @@ module Hatena2md
 
         next if article.status != 'Publish'
 
+        dirname = article.date.strftime('%Y/%m/%d')
         markdown_file = File.join(output_base_dir,
-                                  article.date.strftime('%Y/%m/%d'),
+                                  dirname,
                                   "#{article.basename}.html.md")
         FileUtils.mkdir_p File.dirname(markdown_file)
 
@@ -24,6 +25,12 @@ module Hatena2md
         if options[:remove_keyword]
           require 'hatena2md/html_filter/keyword_filter'
           mdBuilder.add_filter(HtmlFilter::KeywordFilter.new)
+        end
+        if options[:local_image]
+          require 'hatena2md/html_filter/local_image_filter'
+          filter = HtmlFilter::LocalImageFilter.new
+          filter.dirname = '/' + dirname
+          mdBuilder.add_filter(filter)
         end
 
         frontmatter = ArticleFrontmatter.new(article).frontmatter
