@@ -1,0 +1,57 @@
+#!/usr/bin/env ruby
+
+lib = File.expand_path('../../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+
+require 'mtif'
+require 'nokogiri'
+require 'hatena2md/article'
+require 'open-uri'
+
+def usage
+  STDERR.puts "Usage: hatena-photo-fetch <source_mtif>"
+  STDERR.puts ""
+  STDERR.puts "  -o                 output directory (default is basename of <source_mtif>)"
+end
+
+if ARGV.empty? || ARGV.include?('-h') || ARGV.include?('--help')
+  usage()
+  exit(1)
+end
+
+output_option_index = ARGV.index('-o') || ARGV.index('--output')
+if output_option_index == (ARGV.length - 1)
+  usage
+  exit(1)
+end
+if output_option_index
+  ARGV.delete_at(output_option_index)
+  output_dir = ARGV.delete_at(output_option_index)
+end
+
+source = File.basename(ARGV[0])
+output_dir ||= File.basename(source, File.extname(source))
+
+mtif = MTIF.load_file(source)
+mtif.posts.each do |post|
+  article = Hatena2md::Article.new(post.data)
+  document = Nokogiri::HTML.parse(article.body)
+
+  dirname = "#{output_dir}/#{article.date.strftime('%Y/%m/%d')}"
+  FileUtils.mkdir_p(dirname)
+
+  document.css('img').each do |img|
+    src = img[:src]
+    src = "http:#{src}" if src[0..1].match('//')
+    next unless src.include?('cdn-ak.f.st-hatena.com')
+
+    filename = src.split('/').last
+    File.open(File.join(dirname, filename), "wb") do |saved_file|
+      puts "Downloading #{src}"
+      puts "  => #{File.join(dirname, filename)}"
+      open(src, "rb") do |read_file|
+        saved_file.write(read_file.read)
+      end
+    end
+  end
+end
