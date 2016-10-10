@@ -8,6 +8,7 @@ def usage
   STDERR.puts ""
   STDERR.puts "  -o                 output directory (default is basename of <source_mtif>)"
   STDERR.puts "  --remove-keyword   remove links to hatena keyword"
+  STDERR.puts "  --local-image      convert image urls as local link"
 end
 
 if ARGV.empty? || ARGV.include?('-h') || ARGV.include?('--help')
@@ -27,7 +28,8 @@ end
 
 options = {
   source: File.basename(ARGV[0]),
-  remove_keyword: ARGV.include?('--remove-keyword')
+  remove_keyword: ARGV.include?('--remove-keyword'),
+  local_image: ARGV.include?('--local-image')
 }
 
 options[:output_dir] = File.basename(options[:source], File.extname(options[:source])) unless output_dir
