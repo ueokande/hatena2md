@@ -44,6 +44,7 @@ mtif.posts.each do |post|
     src = img[:src]
     src = "http:#{src}" if src[0..1].match('//')
     next unless src.include?('cdn-ak.f.st-hatena.com')
+    next unless article.status == 'Publish'
 
     filename = src.split('/').last
     File.open(File.join(dirname, filename), "wb") do |saved_file|
