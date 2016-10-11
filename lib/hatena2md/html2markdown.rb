@@ -31,7 +31,7 @@ class Html2Markdown
   end
 
   def code(node)
-    "`#{convert_children(node)}`"
+    "`#{node.inner_text}`"
   end
 
   def tt(node)
@@ -121,7 +121,11 @@ class Html2Markdown
   end
 
   def text(node)
-    node.inner_text.gsub(/\A\n*/, '').gsub(/\n*\z/, '').gsub(/\A +/, ' ').gsub(/ +\z/, ' ')
+    text = node.inner_text.gsub(/\A\n*/, '').gsub(/\n*\z/, '').gsub(/\A +/, ' ').gsub(/ +\z/, ' ')
+    %w(\\ ` * _ { } [ ] ( ) # + - . !).each do |c|
+      text.gsub!(c, "\\\\#{c}")
+    end
+    text
   end
 
   def blockquote(node)
